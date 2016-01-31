@@ -1,0 +1,279 @@
+---
+title: "Recognition of Preformence on Weight Lifting Exercises"
+author: "Thomas Dolgos"
+date: "January 31, 2016"
+output: html_document
+---
+#### In this project, the goal was  to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants to predict how well they preformed the exercises. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+### Load packeges
+```{r, echo=TRUE}
+require(caret)
+require(dplyr)
+require(FSelector)
+require(rpart)
+```
+
+### Load and proses data
+#### Manualy removed unwanted columns, only keped rawdata
+
+
+```{r, echo=TRUE}
+pml <- read.csv("pml-training.csv")
+pml.dt <- pml
+pml.dt$classe <- as.character(pml.dt$classe)
+pml.dt <- pml.dt[, -c(12:36, 50:59, 69:83)]
+pml.dt <- pml.dt[, -c(37:62, 75:89, 91:100)]
+pml.dt <- pml.dt[, -c(1)]
+pml.dt <- pml.dt[, -c(2:3)]
+pml.dt <- pml.dt[, -c(1)]
+pml.dt <- pml.dt[, -c(1:3)]
+
+colnames(pml.dt)
+```
+
+### Use caret to buidl  traning, testing, and cross validation set
+```{r, echo=TRUE}
+set.seed(245)
+inBuild <- createDataPartition(pml.dt$classe, 
+                               p = .70, list = FALSE)
+
+validation <- pml.dt[-inBuild,]; buildData <- pml.dt[inBuild,]
+
+inTrain <- createDataPartition(buildData$classe,
+                               p=.70, list=FALSE)
+
+training <- buildData[inTrain,]; testing <- buildData[-inTrain,]
+
+dim(training); dim(testing); dim(validation)
+```
+
+## Feture extraction and formula creation
+### Split traning set iin to subsets by class
+### The evaluator function was adaped from an exaple in the FSelector packeg
+### The function is used in cconjuction with best.first.search function to create a smaller feture set which best represtnts the data  
+#### 
+
+```{r, echo=TRUE, cache=TRUE}
+A_Btype <- filter(training, 
+                  classe %in% c("A","B"))
+A_Ctype <- filter(training, 
+                  classe %in% c("A","C"))
+A_Dtype <- filter(training, 
+                  classe %in% c("A","D"))
+A_Etype <- filter(training, 
+                  classe %in% c("A","E"))
+B_Ctype <- filter(training, 
+                  classe %in% c("B","C"))
+
+evaluator <- function(subset) {
+  #k-fold cross validation
+  k <- 5
+  splits <- runif(nrow(testing))
+  results = sapply(1:k, function(i) {
+    test.idx <- (splits >= (i - 1) / k) & (splits < i / k)
+    train.idx <- !test.idx
+    test <- testing[test.idx, , drop=FALSE]
+    train <- testing[train.idx, , drop=FALSE]
+    tree <- rpart(as.simple.formula(subset, "classe"), train)
+    error.rate = sum(test$classe != predict(tree, test, type="c")) / nrow(test)
+    return(1 - error.rate)
+  })
+  #print(subset)
+  #print(mean(results))
+  return(mean(results))
+}
+
+b.f.A_B <- best.first.search(names(A_Btype)[-52], evaluator)
+b.f.A_C <- best.first.search(names(A_Ctype)[-52], evaluator)
+b.f.A_D <- best.first.search(names(A_Dtype)[-52], evaluator)
+b.f.A_E <- best.first.search(names(A_Etype)[-52], evaluator)
+b.f.B_C <- best.first.search(names(B_Ctype)[-52], evaluator)
+
+b.f.A_B
+b.f.A_C
+b.f.A_D
+b.f.A_E
+b.f.B_C
+
+
+
+f.1 <- as.simple.formula( b.f.A_B, "classe")
+f.2 <- as.simple.formula( b.f.A_C, "classe") 
+f.3 <- as.simple.formula( b.f.A_D, "classe") 
+f.4 <- as.simple.formula( b.f.A_E, "classe") 
+f.5 <- as.simple.formula( b.f.B_C, "classe") 
+
+f.1
+f.2
+f.3
+f.4
+f.5
+
+sub.a_all <- unique(as.matrix( c(b.f.A_B, b.f.A_C, b.f.A_D, b.f.A_E, b.f.B_C)))
+
+sub.a_all
+
+
+```
+
+## Modle selection
+### Used random forest and gradiant boosting on each of the five formulas for a total of ten individuyal modles
+
+```{r, echo=TRUE, cache=TRUE}
+cv.5<-trainControl(method="cv", number=5, verbose=T)
+
+mod.rf.1 <- train(f.1 , data = training, method = "rf", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.rf.2 <- train(f.2 , data = training, method = "rf", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.rf.3 <- train(f.3 , data = training, method = "rf", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.rf.4 <- train(f.4 , data = training, method = "rf", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.rf.5 <- train(f.5 , data = training, method = "rf", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.gbm.6 <- train(f.1 , data = training, method = "gbm", 
+                     trControl=cv.5, verbos=FALSE)
+
+
+mod.gbm.7 <- train(f.2 , data = training, method = "gbm", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.gbm.8 <- train(f.3 , data = training, method = "gbm", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.gbm.9 <- train(f.4 , data = training, method = "gbm", 
+                     trControl=cv.5, verbos=FALSE)
+
+mod.gbm.10 <- train(f.5 , data = training, method = "gbm", 
+                      trControl=cv.5, verbos=FALSE)
+
+
+
+
+
+
+
+
+
+```
+
+## Model preformance on testing set
+
+### Each model has some short comings do to the small amount of fetures
+### Uesd a support vector machine to run the individual model predictions in agraget
+```{r, echo=TRUE, cache=TRUE}
+predict.1 <- predict(mod.rf.1, testing)
+predict.2 <- predict(mod.rf.2, testing)
+predict.3 <- predict(mod.rf.3, testing)
+predict.4 <- predict(mod.rf.4, testing)
+predict.5 <- predict(mod.rf.5, testing)
+predict.6<- predict(mod.gbm.6, testing)
+predict.7<- predict(mod.gbm.7, testing)
+predict.8<- predict(mod.gbm.8, testing)
+predict.9<- predict(mod.gbm.9, testing)
+predict.10<- predict(mod.gbm.10, testing)
+
+
+
+
+
+t.1 <- table(predict.1, testing$classe)
+t.2 <- table(predict.2, testing$classe)
+t.3 <- table(predict.3, testing$classe)
+t.4 <- table(predict.4, testing$classe)
+t.5 <- table(predict.5, testing$classe)
+t.6 <- table(predict.6, testing$classe)
+t.7 <- table(predict.7, testing$classe)
+t.8 <- table(predict.8, testing$classe)
+t.9 <- table(predict.9, testing$classe)
+t.10 <- table(predict.10, testing$classe)
+
+t.1
+t.2
+t.3
+t.4
+t.5
+t.6
+t.7
+t.8
+t.9
+t.10
+
+
+c.1 <- confusionMatrix(t.1)
+c.2 <-confusionMatrix(t.2)
+c.3 <-confusionMatrix(t.3)
+c.4 <-confusionMatrix(t.4)
+c.5 <-confusionMatrix(t.5)
+c.6 <-confusionMatrix(t.6)
+c.7 <-confusionMatrix(t.7)
+c.8 <-confusionMatrix(t.7)
+c.9 <-confusionMatrix(t.9)
+c.10 <-confusionMatrix(t.10)
+
+c.1$overall
+c.2$overall
+c.3$overall
+c.4$overall
+c.5$overall
+c.6$overall
+c.7$overall
+c.8$overall
+c.9$overall
+c.10$overall
+
+
+predDF <- data.frame(predict.1, predict.2, predict.3, predict.4, predict.5, predict.6, predict.7, predict.8, predict.9, predict.10, classe= testing$classe )
+
+
+
+mod.svm <-  train(classe ~ ., data = predDF, method="svmRadial", 
+                  trControl=trainControl(method='cv', number=5), 
+                  tuneGrid = expand.grid(.sigma=0.1401,.C=10))
+
+mod.svm$finalModel
+predictions.combModFit <- predict(mod.svm, predDF)
+table(testing$classe, predictions.combModFit)
+confusionMatrix(table(predictions.combModFit, testing$classe))
+
+
+```
+
+
+## Model preformance on validation set
+
+### This is done to test out of sample erro
+```{r, echo=TRUE, cache=TRUE}
+predict.1V <- predict(mod.rf.1, validation)
+predict.2V <- predict(mod.rf.2, validation)
+predict.3V <- predict(mod.rf.3, validation)
+predict.4V <- predict(mod.rf.4, validation)
+predict.5V <- predict(mod.rf.5, validation)
+predict.6V <- predict(mod.gbm.6, validation)
+predict.7V <- predict(mod.gbm.7, validation)
+predict.8V <- predict(mod.gbm.8, validation)
+predict.9V <- predict(mod.gbm.9, validation)
+predict.10V <- predict(mod.gbm.10, validation)
+
+
+predDFv <- data.frame(predict.1V, predict.2V, predict.3V, predict.4V, predict.5V,  predict.6V,predict.7V, predict.8V,predict.9V, predict.10V,classe= validation$classe )
+
+
+mod.svm.V <-  train(classe ~ ., data = predDFv, method="svmRadial", 
+                    trControl=trainControl(method='cv', number=5), 
+                    tuneGrid = expand.grid(.sigma=0.1401,.C=10))
+
+mod.svm$finalModel
+predictions.combModFitv <- predict(mod.svm.V, predDFv)
+table(validation$classe, predictions.combModFitv)
+confusionMatrix(table(predictions.combModFitv, validation$classe))
+```
+
+
