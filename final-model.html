@@ -175,13 +175,13 @@ B_Ctype &lt;- filter(training,
 
 evaluator &lt;- function(subset) {
   #k-fold cross validation
-  k &lt;- 5
-  splits &lt;- runif(nrow(testing))
+  k &lt;- 10
+  splits &lt;- runif(nrow(training))
   results = sapply(1:k, function(i) {
     test.idx &lt;- (splits &gt;= (i - 1) / k) &amp; (splits &lt; i / k)
     train.idx &lt;- !test.idx
-    test &lt;- testing[test.idx, , drop=FALSE]
-    train &lt;- testing[train.idx, , drop=FALSE]
+    test &lt;- training[test.idx, , drop=FALSE]
+    train &lt;- training[train.idx, , drop=FALSE]
     tree &lt;- rpart(as.simple.formula(subset, &quot;classe&quot;), train)
     error.rate = sum(test$classe != predict(tree, test, type=&quot;c&quot;)) / nrow(test)
     return(1 - error.rate)
@@ -198,26 +198,24 @@ b.f.A_E &lt;- best.first.search(names(A_Etype)[-52], evaluator)
 b.f.B_C &lt;- best.first.search(names(B_Ctype)[-52], evaluator)
 
 b.f.A_B</code></pre>
-<pre><code>##  [1] &quot;pitch_belt&quot;        &quot;yaw_belt&quot;          &quot;yaw_arm&quot;          
-##  [4] &quot;accel_arm_z&quot;       &quot;yaw_dumbbell&quot;      &quot;magnet_dumbbell_x&quot;
-##  [7] &quot;magnet_dumbbell_y&quot; &quot;magnet_dumbbell_z&quot; &quot;pitch_forearm&quot;    
-## [10] &quot;magnet_forearm_x&quot;  &quot;magnet_forearm_y&quot;</code></pre>
+<pre><code>## [1] &quot;roll_belt&quot;         &quot;pitch_belt&quot;        &quot;yaw_belt&quot;         
+## [4] &quot;yaw_arm&quot;           &quot;accel_dumbbell_y&quot;  &quot;magnet_dumbbell_z&quot;</code></pre>
 <pre class="r"><code>b.f.A_C</code></pre>
-<pre><code>## [1] &quot;pitch_belt&quot;        &quot;yaw_belt&quot;          &quot;yaw_arm&quot;          
-## [4] &quot;yaw_dumbbell&quot;      &quot;magnet_dumbbell_y&quot; &quot;magnet_dumbbell_z&quot;
-## [7] &quot;pitch_forearm&quot;     &quot;gyros_forearm_z&quot;</code></pre>
+<pre><code>## [1] &quot;roll_belt&quot;         &quot;pitch_belt&quot;        &quot;yaw_belt&quot;         
+## [4] &quot;yaw_arm&quot;           &quot;gyros_dumbbell_z&quot;  &quot;accel_dumbbell_y&quot; 
+## [7] &quot;magnet_dumbbell_z&quot;</code></pre>
 <pre class="r"><code>b.f.A_D</code></pre>
-<pre><code>## [1] &quot;pitch_belt&quot;        &quot;yaw_belt&quot;          &quot;yaw_arm&quot;          
-## [4] &quot;accel_dumbbell_z&quot;  &quot;magnet_dumbbell_y&quot; &quot;magnet_dumbbell_z&quot;</code></pre>
+<pre><code>## [1] &quot;roll_belt&quot;         &quot;pitch_belt&quot;        &quot;yaw_belt&quot;         
+## [4] &quot;gyros_belt_x&quot;      &quot;yaw_arm&quot;           &quot;accel_dumbbell_y&quot; 
+## [7] &quot;magnet_dumbbell_z&quot; &quot;gyros_forearm_x&quot;</code></pre>
 <pre class="r"><code>b.f.A_E</code></pre>
-<pre><code>##  [1] &quot;pitch_belt&quot;        &quot;yaw_belt&quot;          &quot;yaw_arm&quot;          
-##  [4] &quot;gyros_arm_x&quot;       &quot;magnet_arm_z&quot;      &quot;yaw_dumbbell&quot;     
-##  [7] &quot;magnet_dumbbell_y&quot; &quot;magnet_dumbbell_z&quot; &quot;roll_forearm&quot;     
-## [10] &quot;pitch_forearm&quot;     &quot;accel_forearm_z&quot;</code></pre>
+<pre><code>## [1] &quot;roll_belt&quot;         &quot;pitch_belt&quot;        &quot;yaw_belt&quot;         
+## [4] &quot;gyros_belt_y&quot;      &quot;yaw_arm&quot;           &quot;accel_dumbbell_y&quot; 
+## [7] &quot;magnet_dumbbell_z&quot; &quot;magnet_forearm_z&quot;</code></pre>
 <pre class="r"><code>b.f.B_C</code></pre>
-<pre><code>## [1] &quot;pitch_belt&quot;        &quot;yaw_belt&quot;          &quot;yaw_arm&quot;          
-## [4] &quot;magnet_arm_z&quot;      &quot;yaw_dumbbell&quot;      &quot;accel_dumbbell_z&quot; 
-## [7] &quot;magnet_dumbbell_y&quot; &quot;magnet_dumbbell_z&quot;</code></pre>
+<pre><code>## [1] &quot;roll_belt&quot;         &quot;pitch_belt&quot;        &quot;yaw_belt&quot;         
+## [4] &quot;total_accel_belt&quot;  &quot;magnet_belt_z&quot;     &quot;yaw_arm&quot;          
+## [7] &quot;accel_dumbbell_y&quot;  &quot;magnet_dumbbell_z&quot; &quot;gyros_forearm_x&quot;</code></pre>
 <pre class="r"><code>f.1 &lt;- as.simple.formula( b.f.A_B, &quot;classe&quot;)
 f.2 &lt;- as.simple.formula( b.f.A_C, &quot;classe&quot;) 
 f.3 &lt;- as.simple.formula( b.f.A_D, &quot;classe&quot;) 
@@ -225,48 +223,43 @@ f.4 &lt;- as.simple.formula( b.f.A_E, &quot;classe&quot;)
 f.5 &lt;- as.simple.formula( b.f.B_C, &quot;classe&quot;) 
 
 f.1</code></pre>
-<pre><code>## classe ~ pitch_belt + yaw_belt + yaw_arm + accel_arm_z + yaw_dumbbell + 
-##     magnet_dumbbell_x + magnet_dumbbell_y + magnet_dumbbell_z + 
-##     pitch_forearm + magnet_forearm_x + magnet_forearm_y
-## &lt;environment: 0x000000001944af78&gt;</code></pre>
+<pre><code>## classe ~ roll_belt + pitch_belt + yaw_belt + yaw_arm + accel_dumbbell_y + 
+##     magnet_dumbbell_z
+## &lt;environment: 0x000000005a4097e8&gt;</code></pre>
 <pre class="r"><code>f.2</code></pre>
-<pre><code>## classe ~ pitch_belt + yaw_belt + yaw_arm + yaw_dumbbell + magnet_dumbbell_y + 
-##     magnet_dumbbell_z + pitch_forearm + gyros_forearm_z
-## &lt;environment: 0x00000000193856f8&gt;</code></pre>
+<pre><code>## classe ~ roll_belt + pitch_belt + yaw_belt + yaw_arm + gyros_dumbbell_z + 
+##     accel_dumbbell_y + magnet_dumbbell_z
+## &lt;environment: 0x000000005a38b9b0&gt;</code></pre>
 <pre class="r"><code>f.3</code></pre>
-<pre><code>## classe ~ pitch_belt + yaw_belt + yaw_arm + accel_dumbbell_z + 
-##     magnet_dumbbell_y + magnet_dumbbell_z
-## &lt;environment: 0x0000000019316f60&gt;</code></pre>
+<pre><code>## classe ~ roll_belt + pitch_belt + yaw_belt + gyros_belt_x + yaw_arm + 
+##     accel_dumbbell_y + magnet_dumbbell_z + gyros_forearm_x
+## &lt;environment: 0x000000005a09c500&gt;</code></pre>
 <pre class="r"><code>f.4</code></pre>
-<pre><code>## classe ~ pitch_belt + yaw_belt + yaw_arm + gyros_arm_x + magnet_arm_z + 
-##     yaw_dumbbell + magnet_dumbbell_y + magnet_dumbbell_z + roll_forearm + 
-##     pitch_forearm + accel_forearm_z
-## &lt;environment: 0x00000000192a5110&gt;</code></pre>
+<pre><code>## classe ~ roll_belt + pitch_belt + yaw_belt + gyros_belt_y + yaw_arm + 
+##     accel_dumbbell_y + magnet_dumbbell_z + magnet_forearm_z
+## &lt;environment: 0x000000005a000350&gt;</code></pre>
 <pre class="r"><code>f.5</code></pre>
-<pre><code>## classe ~ pitch_belt + yaw_belt + yaw_arm + magnet_arm_z + yaw_dumbbell + 
-##     accel_dumbbell_z + magnet_dumbbell_y + magnet_dumbbell_z
-## &lt;environment: 0x0000000019243e88&gt;</code></pre>
+<pre><code>## classe ~ roll_belt + pitch_belt + yaw_belt + total_accel_belt + 
+##     magnet_belt_z + yaw_arm + accel_dumbbell_y + magnet_dumbbell_z + 
+##     gyros_forearm_x
+## &lt;environment: 0x0000000059f78c38&gt;</code></pre>
 <pre class="r"><code>sub.a_all &lt;- unique(as.matrix( c(b.f.A_B, b.f.A_C, b.f.A_D, b.f.A_E, b.f.B_C)))
 
 sub.a_all</code></pre>
 <pre><code>##       [,1]               
-##  [1,] &quot;pitch_belt&quot;       
-##  [2,] &quot;yaw_belt&quot;         
-##  [3,] &quot;yaw_arm&quot;          
-##  [4,] &quot;accel_arm_z&quot;      
-##  [5,] &quot;yaw_dumbbell&quot;     
-##  [6,] &quot;magnet_dumbbell_x&quot;
-##  [7,] &quot;magnet_dumbbell_y&quot;
-##  [8,] &quot;magnet_dumbbell_z&quot;
-##  [9,] &quot;pitch_forearm&quot;    
-## [10,] &quot;magnet_forearm_x&quot; 
-## [11,] &quot;magnet_forearm_y&quot; 
-## [12,] &quot;gyros_forearm_z&quot;  
-## [13,] &quot;accel_dumbbell_z&quot; 
-## [14,] &quot;gyros_arm_x&quot;      
-## [15,] &quot;magnet_arm_z&quot;     
-## [16,] &quot;roll_forearm&quot;     
-## [17,] &quot;accel_forearm_z&quot;</code></pre>
+##  [1,] &quot;roll_belt&quot;        
+##  [2,] &quot;pitch_belt&quot;       
+##  [3,] &quot;yaw_belt&quot;         
+##  [4,] &quot;yaw_arm&quot;          
+##  [5,] &quot;accel_dumbbell_y&quot; 
+##  [6,] &quot;magnet_dumbbell_z&quot;
+##  [7,] &quot;gyros_dumbbell_z&quot; 
+##  [8,] &quot;gyros_belt_x&quot;     
+##  [9,] &quot;gyros_forearm_x&quot;  
+## [10,] &quot;gyros_belt_y&quot;     
+## [11,] &quot;magnet_forearm_z&quot; 
+## [12,] &quot;total_accel_belt&quot; 
+## [13,] &quot;magnet_belt_z&quot;</code></pre>
 </div>
 </div>
 </div>

@@ -68,13 +68,13 @@ B_Ctype <- filter(training,
 
 evaluator <- function(subset) {
   #k-fold cross validation
-  k <- 5
-  splits <- runif(nrow(testing))
+  k <- 10
+  splits <- runif(nrow(training))
   results = sapply(1:k, function(i) {
     test.idx <- (splits >= (i - 1) / k) & (splits < i / k)
     train.idx <- !test.idx
-    test <- testing[test.idx, , drop=FALSE]
-    train <- testing[train.idx, , drop=FALSE]
+    test <- training[test.idx, , drop=FALSE]
+    train <- training[train.idx, , drop=FALSE]
     tree <- rpart(as.simple.formula(subset, "classe"), train)
     error.rate = sum(test$classe != predict(tree, test, type="c")) / nrow(test)
     return(1 - error.rate)
@@ -89,7 +89,7 @@ b.f.A_C <- best.first.search(names(A_Ctype)[-52], evaluator)
 b.f.A_D <- best.first.search(names(A_Dtype)[-52], evaluator)
 b.f.A_E <- best.first.search(names(A_Etype)[-52], evaluator)
 b.f.B_C <- best.first.search(names(B_Ctype)[-52], evaluator)
-
+ n
 b.f.A_B
 b.f.A_C
 b.f.A_D
