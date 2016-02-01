@@ -68,11 +68,11 @@ img {
 </div>
 
 
-<div id="in-this-project-the-goal-was-to-use-data-from-accelerometers-on-the-belt-forearm-arm-and-dumbell-of-6-participants-to-predict-how-well-they-preformed-the-exercises.-they-were-asked-to-perform-barbell-lifts-correctly-and-incorrectly-in-5-different-ways.-more-information-is-available-from-the-website-here-httpgroupware.les.inf.puc-rio.brhar-see-the-section-on-the-weight-lifting-exercise-dataset." class="section level4">
-<h4>In this project, the goal was to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants to predict how well they preformed the exercises. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).</h4>
+<div id="in-this-project-the-goal-was-to-use-data-from-accelerometers-on-the-belt-forearm-arm-and-dumbell-of-6-participants-to-predict-how-well-they-performed-the-exercises.-they-were-asked-to-perform-barbell-lifts-correctly-and-incorrectly-in-5-different-ways.-more-information-is-available-from-the-website-here-httpgroupware.les.inf.puc-rio.brhar-see-the-section-on-the-weight-lifting-exercise-dataset." class="section level4">
+<h4>In this project, the goal was to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants to predict how well they performed the exercises. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).</h4>
 </div>
-<div id="load-packeges" class="section level3">
-<h3>Load packeges</h3>
+<div id="load-packages" class="section level3">
+<h3>Load packages</h3>
 <pre class="r"><code>require(caret)</code></pre>
 <pre><code>## Loading required package: caret</code></pre>
 <pre><code>## Warning: package 'caret' was built under R version 3.2.3</code></pre>
@@ -97,10 +97,10 @@ img {
 <pre class="r"><code>require(rpart)</code></pre>
 <pre><code>## Loading required package: rpart</code></pre>
 </div>
-<div id="load-and-proses-data" class="section level3">
-<h3>Load and proses data</h3>
-<div id="manualy-removed-unwanted-columns-only-keped-rawdata" class="section level4">
-<h4>Manualy removed unwanted columns, only keped rawdata</h4>
+<div id="load-and-process-data" class="section level3">
+<h3>Load and process data</h3>
+<div id="manually-removed-unwanted-columns-only-kept-raw-data" class="section level4">
+<h4>Manually removed unwanted columns, only kept raw data</h4>
 <pre class="r"><code>pml &lt;- read.csv(&quot;pml-training.csv&quot;)
 pml.dt &lt;- pml
 pml.dt$classe &lt;- as.character(pml.dt$classe)
@@ -132,8 +132,8 @@ colnames(pml.dt)</code></pre>
 ## [52] &quot;classe&quot;</code></pre>
 </div>
 </div>
-<div id="use-caret-to-buidl-traning-testing-and-cross-validation-set" class="section level3">
-<h3>Use caret to buidl traning, testing, and cross validation set</h3>
+<div id="use-caret-to-build-training-testing-and-cross-validation-set" class="section level3">
+<h3>Use caret to build training, testing, and cross validation set</h3>
 <pre class="r"><code>set.seed(245)
 inBuild &lt;- createDataPartition(pml.dt$classe, 
                                p = .70, list = FALSE)
@@ -150,16 +150,16 @@ dim(training); dim(testing); dim(validation)</code></pre>
 <pre><code>## [1] 4118   52</code></pre>
 <pre><code>## [1] 5885   52</code></pre>
 </div>
-<div id="feture-extraction-and-formula-creation" class="section level2">
-<h2>Feture extraction and formula creation</h2>
-<div id="split-traning-set-iin-to-subsets-by-class" class="section level3">
-<h3>Split traning set iin to subsets by class</h3>
+<div id="feature-extraction-and-formula-creation" class="section level2">
+<h2>Feature extraction and formula creation</h2>
+<div id="split-training-set-into-subsets-by-class" class="section level3">
+<h3>Split training set into subsets by class</h3>
 </div>
-<div id="the-evaluator-function-was-adaped-from-an-exaple-in-the-fselector-packeg" class="section level3">
-<h3>The evaluator function was adaped from an exaple in the FSelector packeg</h3>
+<div id="the-evaluator-function-was-adapted-from-an-example-in-the-fselector-packege" class="section level3">
+<h3>The evaluator function was adapted from an example in the FSelector packege</h3>
 </div>
-<div id="the-function-is-used-in-cconjuction-with-best.first.search-function-to-create-a-smaller-feture-set-which-best-represtnts-the-data" class="section level3">
-<h3>The function is used in cconjuction with best.first.search function to create a smaller feture set which best represtnts the data</h3>
+<div id="the-function-is-used-in-conjuction-with-best.first.search-function-to-create-a-smaller-feature-set-which-best-represents-the-data" class="section level3">
+<h3>The function is used in conjuction with best.first.search function to create a smaller feature set which best represents the data</h3>
 <div id="section" class="section level4">
 <h4></h4>
 <pre class="r"><code>A_Btype &lt;- filter(training, 
@@ -270,10 +270,10 @@ sub.a_all</code></pre>
 </div>
 </div>
 </div>
-<div id="modle-selection" class="section level2">
-<h2>Modle selection</h2>
-<div id="used-random-forest-and-gradiant-boosting-on-each-of-the-five-formulas-for-a-total-of-ten-individuyal-modles" class="section level3">
-<h3>Used random forest and gradiant boosting on each of the five formulas for a total of ten individuyal modles</h3>
+<div id="model-selection" class="section level2">
+<h2>Model selection</h2>
+<div id="used-random-forest-and-gradiant-boosting-on-each-of-the-five-formulas-for-a-total-of-ten-individual-models" class="section level3">
+<h3>Used random forest and gradiant boosting on each of the five formulas for a total of ten individual models</h3>
 <pre class="r"><code>cv.5&lt;-trainControl(method=&quot;cv&quot;, number=5, verbose=T)
 
 mod.rf.1 &lt;- train(f.1 , data = training, method = &quot;rf&quot;, 
@@ -668,13 +668,13 @@ mod.rf.1 &lt;- train(f.1 , data = training, method = &quot;rf&quot;,
 ## Fitting n.trees = 150, interaction.depth = 3, shrinkage = 0.1, n.minobsinnode = 10 on full training set</code></pre>
 </div>
 </div>
-<div id="model-preformance-on-testing-set" class="section level2">
-<h2>Model preformance on testing set</h2>
-<div id="each-model-has-some-short-comings-do-to-the-small-amount-of-fetures" class="section level3">
-<h3>Each model has some short comings do to the small amount of fetures</h3>
+<div id="model-performance-on-testing-set" class="section level2">
+<h2>Model performance on testing set</h2>
+<div id="each-model-has-some-short-comings-due-to-the-small-amount-of-features" class="section level3">
+<h3>Each model has some short comings due to the small amount of features</h3>
 </div>
-<div id="uesd-a-support-vector-machine-to-run-the-individual-model-predictions-in-agraget" class="section level3">
-<h3>Uesd a support vector machine to run the individual model predictions in agraget</h3>
+<div id="used-a-support-vector-machine-to-run-the-individual-model-predictions-in-aggregate" class="section level3">
+<h3>Used a support vector machine to run the individual model predictions in aggregate</h3>
 <pre class="r"><code>predict.1 &lt;- predict(mod.rf.1, testing)
 predict.2 &lt;- predict(mod.rf.2, testing)
 predict.3 &lt;- predict(mod.rf.3, testing)
@@ -906,10 +906,10 @@ table(testing$classe, predictions.combModFit)</code></pre>
 ## Balanced Accuracy      0.9980   0.9936   0.9923   0.9969   0.9960</code></pre>
 </div>
 </div>
-<div id="model-preformance-on-validation-set" class="section level2">
-<h2>Model preformance on validation set</h2>
-<div id="this-is-done-to-test-out-of-sample-erro" class="section level3">
-<h3>This is done to test out of sample erro</h3>
+<div id="model-performance-on-validation-set" class="section level2">
+<h2>Model performance on validation set</h2>
+<div id="this-is-done-to-test-out-of-sample-error" class="section level3">
+<h3>This is done to test out of sample error</h3>
 <pre class="r"><code>predict.1V &lt;- predict(mod.rf.1, validation)
 predict.2V &lt;- predict(mod.rf.2, validation)
 predict.3V &lt;- predict(mod.rf.3, validation)

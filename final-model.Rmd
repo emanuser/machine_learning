@@ -4,9 +4,9 @@ author: "Thomas Dolgos"
 date: "January 31, 2016"
 output: html_document
 ---
-#### In this project, the goal was  to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants to predict how well they preformed the exercises. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+#### In this project, the goal was to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants to predict how well they performed the exercises. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
 
-### Load packeges
+### Load packages
 ```{r, echo=TRUE}
 require(caret)
 require(dplyr)
@@ -14,8 +14,8 @@ require(FSelector)
 require(rpart)
 ```
 
-### Load and proses data
-#### Manualy removed unwanted columns, only keped rawdata
+### Load and process data
+#### Manually removed unwanted columns, only kept raw data
 
 
 ```{r, echo=TRUE}
@@ -32,7 +32,7 @@ pml.dt <- pml.dt[, -c(1:3)]
 colnames(pml.dt)
 ```
 
-### Use caret to buidl  traning, testing, and cross validation set
+### Use caret to build  training, testing, and cross validation set
 ```{r, echo=TRUE}
 set.seed(245)
 inBuild <- createDataPartition(pml.dt$classe, 
@@ -48,10 +48,10 @@ training <- buildData[inTrain,]; testing <- buildData[-inTrain,]
 dim(training); dim(testing); dim(validation)
 ```
 
-## Feture extraction and formula creation
-### Split traning set iin to subsets by class
-### The evaluator function was adaped from an exaple in the FSelector packeg
-### The function is used in cconjuction with best.first.search function to create a smaller feture set which best represtnts the data  
+## Feature extraction and formula creation
+### Split training set into subsets by class
+### The evaluator function was adapted from an example in the FSelector packege
+### The function is used in conjuction with best.first.search function to create a smaller feature set which best represents the data  
 #### 
 
 ```{r, echo=TRUE, cache=TRUE}
@@ -117,8 +117,8 @@ sub.a_all
 
 ```
 
-## Modle selection
-### Used random forest and gradiant boosting on each of the five formulas for a total of ten individuyal modles
+## Model selection
+### Used random forest and gradiant boosting on each of the five formulas for a total of ten individual models
 
 ```{r, echo=TRUE, cache=TRUE}
 cv.5<-trainControl(method="cv", number=5, verbose=T)
@@ -164,10 +164,10 @@ mod.gbm.10 <- train(f.5 , data = training, method = "gbm",
 
 ```
 
-## Model preformance on testing set
+## Model performance on testing set
 
-### Each model has some short comings do to the small amount of fetures
-### Uesd a support vector machine to run the individual model predictions in agraget
+### Each model has some short comings due to the small amount of features
+### Used a support vector machine to run the individual model predictions in aggregate
 ```{r, echo=TRUE, cache=TRUE}
 predict.1 <- predict(mod.rf.1, testing)
 predict.2 <- predict(mod.rf.2, testing)
@@ -247,9 +247,9 @@ confusionMatrix(table(predictions.combModFit, testing$classe))
 ```
 
 
-## Model preformance on validation set
+## Model performance on validation set
 
-### This is done to test out of sample erro
+### This is done to test out of sample error
 ```{r, echo=TRUE, cache=TRUE}
 predict.1V <- predict(mod.rf.1, validation)
 predict.2V <- predict(mod.rf.2, validation)
